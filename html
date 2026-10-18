@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAST AI</title>
+  <style>
+    body {
+      margin: 0; padding: 24px;
+      background: #10131b; color: white;
+      font: 17px Arial, sans-serif;
+    }
+    main { max-width: 600px; margin: 40px auto; }
+    h1 { color: #80aaff; }
+    textarea, button {
+      box-sizing: border-box; width: 100%;
+      padding: 14px; margin-top: 12px;
+      border-radius: 12px; font-size: 16px;
+    }
+    textarea { background: #202635; color: white; }
+    button { background: #6595ff; border: 0; font-weight: bold; }
+    #answer { white-space: pre-wrap; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>FAST AI</h1>
+  <p>Твой ИИ на базе DeepSeek</p>
+  <textarea id="question" rows="4"
+    placeholder="Напиши свой вопрос..."></textarea>
+  <button id="send">Отправить</button>
+  <p id="status"></p>
+  <div id="answer"></div>
+</main>
+<script>
+const question = document.getElementById('question');
+const status = document.getElementById('status');
+const answer = document.getElementById('answer');
+
+document.getElementById('send').onclick = async () => {
+  if (!question.value.trim()) return;
+  status.textContent = 'Отправляем запрос...';
+  answer.textContent = '';
+  try {
+    const response = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: question.value})
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Ошибка запроса');
+    answer.textContent = data.reply;
+    status.textContent = 'Готово';
+  } catch (e) {
+    status.textContent = e.message;
+  }
+};
+</script>
+</body>
+</html>
